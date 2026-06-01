@@ -1663,7 +1663,8 @@ function getStationFullBank(station) {
     var multiple = completeQuestions(raw.multiple || [], 6, 'multiple', station);  
     var judge = completeQuestions(raw.judge || [], 6, 'judge', station);  
     var fill = completeQuestions(raw.fill || [], 8, 'fill', station);  
-    var essay = completeQuestions(raw.essay || [], 4, 'essay', station);  
+    // 题库无简答题时跳过，不补占位题  
+    var essay = (raw.essay && raw.essay.length > 0) ? completeQuestions(raw.essay, 4, 'essay', station) : [];  
     return { single: single, multiple: multiple, judge: judge, fill: fill, essay: essay };  
 }  
   
