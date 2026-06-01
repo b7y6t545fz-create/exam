@@ -1639,6 +1639,8 @@ var STATION_BANKS = {
 
 // 已用题目追踪（按岗位+题型记录题目标题，避免重复出题）  
 var usedQuestions = {};  
+// 答题统计：记录每题的对错历史，用于优先级排序  
+var questionStats = {};  
   
 function completeQuestions(arr, target, type, stationName) {  
     var result = arr.slice();  
@@ -1671,11 +1673,12 @@ function getStationFullBank(station) {
 // 从题库中随机抽题，排除已使用的题目  
 function sampleFrom(arr, count, type, station) {  
     if (!arr || arr.length === 0) return [];  
-    // 初始化该岗位+题型的已用集合  
     var key = station + "|" + type;  
     if (!usedQuestions[key]) usedQuestions[key] = [];  
+    if (!questionStats[key]) questionStats[key] = {};  
     var used = usedQuestions[key];  
-    // 过滤掉已用的题目  
+    var stats = questionStats[key];  
+    // 过滤掉最近用过的题目（避免相邻两次重复）  
     var available = [];  
     for (var i = 0; i < arr.length; i++) {  
         var found = false;  
@@ -1689,15 +1692,32 @@ function sampleFrom(arr, count, type, station) {
         usedQuestions[key] = [];  
         available = arr.slice();  
     }  
-    // 随机洗牌，取前 count 题  
-    var shuffled = available.slice();  
-    for (var i = shuffled.length - 1; i > 0; i--) {  
-        var j = Math.floor(Math.random() * (i + 1));  
-        var temp = shuffled[i];  
-        shuffled[i] = shuffled[j];  
-        shuffled[j] = temp;  
+    // 按优先级分组：错过的优先，没用过的其次，对过的最后  
+    var wrongGroup = [], unusedGroup = [], correctGroup = [];  
+    for (var i = 0; i < available.length; i++) {  
+        var s = stats[available[i].title];  
+        if (!s) { unusedGroup.push(available[i]); }  
+        else if (s.last === 'wrong') { wrongGroup.push(available[i]); }  
+        else { correctGroup.push(available[i]); }  
     }  
-    var picked = shuffled.slice(0, count);  
+    // 错题按错次数降序排列（错得越多越优先）  
+    wrongGroup.sort(function(a, b) {   
+        var wa = (stats[a.title] && stats[a.title].timesWrong) || 0;  
+        var wb = (stats[b.title] && stats[b.title].timesWrong) || 0;  
+        return wb - wa;  
+    });  
+    // 未用题和正确题各自随机洗牌  
+    function shuffle(a) {  
+        for (var i = a.length - 1; i > 0; i--) {  
+            var j = Math.floor(Math.random() * (i + 1));  
+            var tmp = a[i]; a[i] = a[j]; a[j] = tmp;  
+        }  
+    }  
+    shuffle(unusedGroup);  
+    shuffle(correctGroup);  
+    // 合并：错题优先 → 未用题 → 正确题  
+    var sorted = wrongGroup.concat(unusedGroup).concat(correctGroup);  
+    var picked = sorted.slice(0, count);  
     // 记录已用  
     for (var p = 0; p < picked.length; p++) {  
         usedQuestions[key].push(picked[p].title);  
@@ -1845,6 +1865,13 @@ function computeScore() {
             if (user && user.trim().length > 3) isCorrect = true;  
         }  
         if (isCorrect) correct++;  
+        // 记录答题统计，用于下次出题优先级  
+        var statKey = currentStation + '|' + q.type;  
+        if (!questionStats[statKey]) questionStats[statKey] = {};  
+        var qStat = questionStats[statKey][q.title];  
+        if (!qStat) qStat = questionStats[statKey][q.title] = { timesWrong: 0, timesCorrect: 0, last: null };  
+        if (isCorrect) { qStat.timesCorrect++; qStat.last = 'correct'; }  
+        else { qStat.timesWrong++; qStat.last = 'wrong'; }  
         details.push({ title: q.title, user: user, correct: isCorrect, answerText: q.answerText });  
     }  
     var percent = (correct / currentExam.length * 100).toFixed(1);  
