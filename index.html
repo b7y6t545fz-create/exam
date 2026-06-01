@@ -1882,18 +1882,9 @@ function computeScore() {
     }  
     var percent = (correct / currentExam.length * 100).toFixed(1);  
     scoreSpan.innerText = '⭐ '+percent+'分 ('+correct+'/'+currentExam.length+')';  
-    var resultHtml = '<div class="result-box"><strong>得分: '+percent+'分 ('+correct+'/'+currentExam.length+')</strong><br>';  
+    var resultHtml = '<div class="result-box"><strong>得分: '+percent+'分 ('+correct+'/'+currentExam.length+')</strong>';  
     if (correct === currentExam.length) {  
-        resultHtml += '🎉 满分！';  
-    } else {  
-        resultHtml += '❌ 错题正确答案：<ul>';  
-        for (var d=0; d<details.length; d++) {  
-            if (!details[d].correct) {  
-                var userShow = (details[d].user === undefined || details[d].user === null || details[d].user === '') ? '未作答' : (Array.isArray(details[d].user) ? details[d].user.join(',') : details[d].user);  
-                resultHtml += '<li><strong>'+escapeHtml(details[d].title)+'</strong><br> 你的答案: '+escapeHtml(userShow)+'<br> <span class="correct-ans">✅ 正确答案：'+escapeHtml(details[d].answerText)+'</span></li>';  
-            }  
-        }  
-        resultHtml += '</ul>';  
+        resultHtml += ' 🎉 满分！';  
     }  
     resultHtml += '</div>';  
     resultDiv.innerHTML = resultHtml;  
