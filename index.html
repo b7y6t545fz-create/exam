@@ -1860,13 +1860,39 @@ function computeScore() {
             var userSet = new Set(Array.isArray(user) ? user : []);  
             if (stdSet.size === userSet.size && [...stdSet].every(function(v) { return userSet.has(v); })) isCorrect = true;  
         } else if (q.type === 'fill') {  
-            var stdArr = q.answer.map(function(s) { return s.trim().toLowerCase(); });  
-            var userNorm = (user || '').trim().toLowerCase().replace(/[，,、]/g, ',');  
-            var match = false;  
-            for (var s=0; s<stdArr.length; s++) {  
-                if (userNorm === stdArr[s] || (userNorm.indexOf(stdArr[s]) !== -1 && stdArr[s].length>2)) { match=true; break; }  
+            var stdArr = q.answer;  
+            if (stdArr.length > 1) {  
+                // 多空填空题：不卡顺序、不卡标点符号，按集合比对  
+                var normalizeFillToken = function(s) {  
+                    return s.trim().replace(/^[，,、。；;：:\s]+|[，,、。；;：:\s]+$/g, '').toLowerCase();  
+                };  
+                var stdSet = new Set();  
+                for (var si = 0; si < stdArr.length; si++) {  
+                    var token = normalizeFillToken(stdArr[si]);  
+                    if (token.length > 0) stdSet.add(token);  
+                }  
+                var userParts = (user || '').split(/[，,、；;]/);  
+                var userSet = new Set();  
+                for (var ui = 0; ui < userParts.length; ui++) {  
+                    var token = normalizeFillToken(userParts[ui]);  
+                    if (token.length > 0) userSet.add(token);  
+                }  
+                if (stdSet.size > 0 && stdSet.size === userSet.size) {  
+                    var allMatch = true;  
+                    var stdArr2 = Array.from(stdSet);  
+                    for (var si = 0; si < stdArr2.length; si++) {  
+                        if (!userSet.has(stdArr2[si])) { allMatch = false; break; }  
+                    }  
+                    if (allMatch) isCorrect = true;  
+                }  
+            } else {  
+                // 单空填空题：保持原判罚逻辑不变  
+                var stdSingle = stdArr[0].trim().toLowerCase();  
+                var userNorm = (user || '').trim().toLowerCase().replace(/[，,、]/g, ',');  
+                if (userNorm === stdSingle || (userNorm.indexOf(stdSingle) !== -1 && stdSingle.length > 2)) {  
+                    isCorrect = true;  
+                }  
             }  
-            if (match) isCorrect = true;  
         } else if (q.type === 'essay') {  
             if (user && user.trim().length > 3) isCorrect = true;  
         }  
