@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>特码计算器 - 澳门六合彩</title>
+<style>
+:root {
+  --bg: #1a1a2e;
+  --card-bg: #16213e;
+  --accent: #e94560;
+  --text: #eee;
+  --text-secondary: #aab;
+  --red-wave: #e94560;
+  --blue-wave: #4d8cf5;
+  --green-wave: #2ecc71;
+  --gold: #f0c040;
+  --border: #2a2a4a;
+  --input-bg: #1e2a3a;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang HK', 'Microsoft JhengHei', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  padding-bottom: 40px;
+}
+header {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #1a1a2e 100%);
+  padding: 20px 16px;
+  text-align: center;
+  border-bottom: 2px solid var(--accent);
+  position: sticky; top: 0; z-index: 100;
+}
+header h1 { font-size: 1.6em; color: var(--gold); letter-spacing: 2px; }
+header p { font-size: 0.85em; color: var(--text-secondary); margin-top: 4px; }
+
+.container { max-width: 600px; margin: 0 auto; padding: 12px; }
+
+.card {
+  background: var(--card-bg);
+  border-radius: 14px;
+  padding: 16px;
+  margin-bottom: 14px;
+  border: 1px solid var(--border);
+}
+.card-title {
+  font-size: 1.1em; font-weight: 700; margin-bottom: 12px;
+  display: flex; align-items: center; gap: 8px;
+  color: var(--gold);
+}
+.card-title::before { content: ''; display: inline-block; width: 4px; height: 20px; background: var(--accent); border-radius: 2px; }
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 10px 20px; border: none; border-radius: 10px;
+  font-size: 0.95em; font-weight: 600; cursor: pointer;
+  transition: all 0.2s; color: #fff; white-space: nowrap;
+}
+.btn:active { transform: scale(0.96); }
+.btn-primary { background: var(--accent); }
+.btn-primary:hover { filter: brightness(1.15); }
+.btn-secondary { background: #2a3a5a; }
+.btn-sm { padding: 6px 14px; font-size: 0.82em; border-radius: 8px; }
+.btn-danger { background: #c0392b; }
+.btn-block { width: 100%; }
+
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.row-btn { justify-content: center; gap: 8px; }
+
+input, select {
+  background: var(--input-bg); border: 1px solid var(--border);
+  color: var(--text); padding: 10px 14px; border-radius: 8px;
+  font-size: 0.95em; outline: none; transition: border-color 0.2s;
+  flex: 1; min-width: 0;
+}
+input:focus, select:focus { border-color: var(--accent); }
+input[type="number"] { -moz-appearance: textfield; max-width: 100px; }
+input[type="number"]::-webkit-inner-spin-button { opacity: 1; }
+
+.num-balls { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 12px 0; }
+.num-ball {
+  width: 46px; height: 46px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 800; font-size: 1.1em; color: #fff;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+  animation: popIn 0.3s ease;
+}
+@keyframes popIn { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.num-ball.red { background: var(--red-wave); }
+.num-ball.blue { background: var(--blue-wave); }
+.num-ball.green { background: var(--green-wave); }
+
+.result-meta { text-align: center; font-size: 0.85em; color: var(--text-secondary); margin-top: 6px; display: flex; flex-wrap: wrap; gap: 4px 12px; justify-content: center; }
+.result-meta span { display: inline-flex; align-items: center; gap: 3px; }
+
+.history-list { max-height: 240px; overflow-y: auto; }
+.history-item {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 8px 12px; background: var(--input-bg); border-radius: 8px;
+  margin-bottom: 6px; font-size: 0.9em;
+}
+.history-item .date { color: var(--text-secondary); font-size: 0.8em; }
+.history-item .nums { display: flex; gap: 5px; }
+.history-item .num-tag {
+  display: inline-block; min-width: 28px; text-align: center;
+  padding: 2px 6px; border-radius: 12px; font-weight: 700; font-size: 0.85em;
+}
+.num-tag.red { background: #e9456040; color: var(--red-wave); }
+.num-tag.blue { background: #4d8cf540; color: var(--blue-wave); }
+.num-tag.green { background: #2ecc7140; color: var(--green-wave); }
+
+.stat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(42px, 1fr)); gap: 4px; }
+.stat-cell {
+  aspect-ratio: 1; border-radius: 8px; display: flex; align-items: center; justify-content: center;
+  font-size: 0.75em; font-weight: 700; color: #fff; position: relative;
+}
+.stat-cell .freq { position: absolute; bottom: 2px; right: 4px; font-size: 0.6em; color: rgba(255,255,255,0.7); }
+.stat-cell.cold { opacity: 0.45; }
+.stat-cell.hot { box-shadow: 0 0 12px rgba(240,192,64,0.5); }
+
+.badge {
+  display: inline-block; padding: 3px 10px; border-radius: 20px;
+  font-size: 0.78em; font-weight: 600;
+}
+.badge-red { background: #e9456030; color: var(--red-wave); }
+.badge-blue { background: #4d8cf530; color: var(--blue-wave); }
+.badge-green { background: #2ecc7130; color: var(--green-wave); }
+
+.tab-bar {
+  display: flex; background: var(--input-bg); border-radius: 10px; overflow: hidden; margin-bottom: 12px;
+}
+.tab {
+  flex: 1; text-align: center; padding: 9px 0; cursor: pointer; font-size: 0.85em; font-weight: 600;
+  color: var(--text-secondary); transition: all 0.2s;
+}
+.tab.active { background: var(--accent); color: #fff; }
+.tab:hover:not(.active) { color: var(--text); }
+
+.zodiac-grid { display: grid; grid-template-columns: repeat(6,1fr); gap: 6px; }
+.zodiac-item {
+  background: var(--input-bg); border-radius: 8px; padding: 8px 4px;
+  text-align: center; font-size: 0.8em;
+}
+.zodiac-item .icon { font-size: 1.4em; display: block; margin-bottom: 2px; }
+.zodiac-item .nums { color: var(--text-secondary); font-size: 0.75em; margin-top: 2px; }
+
+.elem-grid { display: grid; grid-template-columns: repeat(5,1fr); gap: 6px; }
+.elem-item {
+  background: var(--input-bg); border-radius: 8px; padding: 8px 4px;
+  text-align: center; font-size: 0.8em;
+}
+.elem-item .elem { font-size: 1.2em; display: block; margin-bottom: 2px; }
+.elem-item .nums { color: var(--text-secondary); font-size: 0.72em; margin-top: 2px; }
+
+.toast {
+  position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+  background: #333; color: #fff; padding: 10px 24px; border-radius: 20px;
+  font-size: 0.9em; z-index: 9999; opacity: 0; transition: opacity 0.3s;
+  pointer-events: none;
+}
+.toast.show { opacity: 1; }
+
+.empty-state { text-align: center; color: var(--text-secondary); padding: 30px 0; font-size: 0.9em; }
+
+@media (max-width: 400px) {
+  .num-ball { width: 38px; height: 38px; font-size: 0.95em; }
+  .stat-grid { grid-template-columns: repeat(auto-fill, minmax(34px, 1fr)); }
+  .zodiac-grid { grid-template-columns: repeat(4,1fr); }
+  .elem-grid { grid-template-columns: repeat(3,1fr); }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>特码计算器</h1>
+  <p>澳门六合彩 · 号码 1-49 · 生肖五行波色分析</p>
+</header>
+
+<div class="toast" id="toast"></div>
+
+<div class="container">
+
+  <!-- 随机选号 -->
+  <div class="card">
+    <div class="card-title">随机选号</div>
+    <div class="row" style="margin-bottom: 10px;">
+      <label style="font-size:0.85em; white-space:nowrap;">生成组数：</label>
+      <input type="number" id="randCount" value="1" min="1" max="20" style="flex:0 0 70px;">
+      <button class="btn btn-primary btn-sm" onclick="generateRandom()">生成特码</button>
+    </div>
+    <div class="num-balls" id="randResult"></div>
+    <div class="result-meta" id="randMeta"></div>
+  </div>
+
+  <!-- 手动录入 -->
+  <div class="card">
+    <div class="card-title">手动录入开奖特码</div>
+    <div class="row" style="margin-bottom: 6px;">
+      <input type="number" id="drawIssue" placeholder="期数 (如158)" min="1" max="365" style="flex:1;">
+      <input type="number" id="drawNum" placeholder="特码 1-49" min="1" max="49" style="flex:0 0 110px;">
+      <button class="btn btn-primary btn-sm" onclick="addRecord()">添加</button>
+    </div>
+    <div class="row" style="margin-bottom: 10px;">
+      <input type="date" id="drawDate" style="flex:1;" placeholder="日期（可选）">
+    </div>
+    <div class="history-list" id="historyList">
+      <div class="empty-state">暂无开奖记录，请先添加</div>
+    </div>
+    <button class="btn btn-danger btn-sm" style="margin-top:8px;" onclick="clearHistory()">清空全部记录</button>
+  </div>
+
+  <!-- 统计分析 -->
+  <div class="card">
+    <div class="card-title">统计分析</div>
+    <div class="tab-bar" id="statTabs">
+      <div class="tab active" data-tab="hotcold">冷热号</div>
+      <div class="tab" data-tab="oddeven">单双大小</div>
+      <div class="tab" data-tab="wave">波色分布</div>
+      <div class="tab" data-tab="zodiac">生肖五行</div>
+    </div>
+    <div id="tabContent"></div>
+  </div>
+
+</div>
+
+<script>
+// ==================== 数据定义 ====================
+
+// 波色
+const WAVE_COLOR = {
+  red: [1,2,7,8,12,13,18,19,23,24,29,30,34,35,40,45,46],
+  blue: [3,4,9,10,14,15,20,25,26,31,36,37,41,42,47,48],
+  green: [5,6,11,16,17,21,22,27,28,32,33,38,39,43,44,49]
+};
+
+function getWaveColor(n) {
+  if (WAVE_COLOR.red.includes(n)) return 'red';
+  if (WAVE_COLOR.blue.includes(n)) return 'blue';
+  return 'green';
+}
+
+// 生肖 (传统六合彩排布)
+const ZODIAC = ['鼠','牛','虎','兔','龙','蛇','马','羊','猴','鸡','狗','猪'];
+const ZODIAC_EMOJI = ['🐭','🐮','🐯','🐰','🐲','🐍','🐴','🐑','🐵','🐔','🐶','🐷'];
+
+function getZodiac(n) {
+  const map = {
+    7:'鼠',19:'鼠',31:'鼠',43:'鼠',
+    6:'牛',18:'牛',30:'牛',42:'牛',
+    5:'虎',17:'虎',29:'虎',41:'虎',
+    4:'兔',16:'兔',28:'兔',40:'兔',
+    3:'龙',15:'龙',27:'龙',39:'龙',
+    2:'蛇',14:'蛇',26:'蛇',38:'蛇',
+    1:'马',13:'马',25:'马',37:'马',49:'马',
+    12:'羊',24:'羊',36:'羊',48:'羊',
+    11:'猴',23:'猴',35:'猴',47:'猴',
+    10:'鸡',22:'鸡',34:'鸡',46:'鸡',
+    9:'狗',21:'狗',33:'狗',45:'狗',
+    8:'猪',20:'猪',32:'猪',44:'猪'
+  };
+  return map[n];
+}
+
+function getZodiacNumbers() {
+  const map = {};
+  for (let i = 1; i <= 49; i++) {
+    const z = getZodiac(i);
+    if (!map[z]) map[z] = [];
+    map[z].push(i);
+  }
+  return map;
+}
+
+// 五行
+const ELEMENTS = {
+  '金': [4,5,12,13,26,27,34,35,42,43],
+  '木': [8,9,16,17,24,25,38,39,46,47],
+  '水': [1,14,15,22,23,30,31,44,45],
+  '火': [2,3,10,11,18,19,32,33,40,41,48,49],
+  '土': [6,7,20,21,28,29,36,37]
+};
+
+function getElement(n) {
+  for (const [e, nums] of Object.entries(ELEMENTS)) {
+    if (nums.includes(n)) return e;
+  }
+  return '';
+}
+
+function getElementEmoji(el) {
+  return { '金':'🥇','木':'🌳','水':'💧','火':'🔥','土':'🪨' }[el] || '';
+}
+
+function isOdd(n) { return n % 2 !== 0; }
+function isBig(n) { return n >= 25; }
+
+// ==================== localStorage ====================
+
+function loadHistory() {
+  try {
+    return JSON.parse(localStorage.getItem('mark6_history') || '[]');
+  } catch(e) { return []; }
+}
+
+function saveHistory(data) {
+  localStorage.setItem('mark6_history', JSON.stringify(data));
+}
+
+// ==================== Toast ====================
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._timeout);
+  t._timeout = setTimeout(() => t.classList.remove('show'), 1800);
+}
+
+// ==================== 随机选号 ====================
+
+function generateRandom() {
+  const count = Math.min(Math.max(parseInt(document.getElementById('randCount').value) || 1, 1), 20);
+  const nums = [];
+  const used = new Set();
+  while (nums.length < count) {
+    const n = Math.floor(Math.random() * 49) + 1;
+    if (!used.has(n)) { used.add(n); nums.push(n); }
+  }
+  nums.sort((a,b) => a-b);
+
+  const ballsDiv = document.getElementById('randResult');
+  const metaDiv = document.getElementById('randMeta');
+  ballsDiv.innerHTML = '';
+  const metaParts = [];
+
+  nums.forEach(n => {
+    const wave = getWaveColor(n);
+    const ball = document.createElement('div');
+    ball.className = `num-ball ${wave}`;
+    ball.textContent = n;
+    ballsDiv.appendChild(ball);
+
+    metaParts.push(`<span>🐉 ${getZodiac(n)}</span>`);
+    metaParts.push(`<span>${getElementEmoji(getElement(n))} ${getElement(n)}</span>`);
+    metaParts.push(`<span class="badge badge-${wave}">${wave==='red'?'红波':wave==='blue'?'蓝波':'绿波'}</span>`);
+    metaParts.push(`<span>${isOdd(n)?'单':'双'}</span>`);
+    metaParts.push(`<span>${isBig(n)?'大':'小'}</span>`);
+  });
+
+  metaDiv.innerHTML = metaParts.join('');
+}
+
+// ==================== 历史记录 ====================
+
+function addRecord() {
+  const issueInput = document.getElementById('drawIssue');
+  const dateInput = document.getElementById('drawDate');
+  const numInput = document.getElementById('drawNum');
+  const issue = parseInt(issueInput.value);
+  const date = dateInput.value;
+  const num = parseInt(numInput.value);
+
+  if (!issue || issue < 1) { showToast('请输入有效期数'); return; }
+  if (!num || num < 1 || num > 49) { showToast('特码范围 1-49'); return; }
+
+  const history = loadHistory();
+  // 同期限去重（保留最新）
+  const filtered = history.filter(r => r.issue !== issue);
+  filtered.push({ issue, date: date || '', num });
+  // 按期数倒序
+  filtered.sort((a, b) => b.issue - a.issue);
+  saveHistory(filtered);
+  renderHistory();
+  document.getElementById('drawNum').value = '';
+  showToast('已添加');
+}
+
+function clearHistory() {
+  if (confirm('确定清空全部开奖记录？此操作不可恢复。')) {
+    saveHistory([]);
+    renderHistory();
+    renderTabContent();
+    showToast('已清空');
+  }
+}
+
+function deleteRecord(index) {
+  const history = loadHistory();
+  history.splice(index, 1);
+  saveHistory(history);
+  renderHistory();
+  renderTabContent();
+}
+
+function renderHistory() {
+  const history = loadHistory();
+  const div = document.getElementById('historyList');
+  if (history.length === 0) {
+    div.innerHTML = '<div class="empty-state">暂无开奖记录，请先添加</div>';
+    return;
+  }
+  div.innerHTML = history.map((r, i) => {
+    const wave = getWaveColor(r.num);
+    const dateStr = r.date ? `<span class="date">${r.date}</span>` : '';
+    const waveLabel = wave === 'red' ? '红波' : wave === 'blue' ? '蓝波' : '绿波';
+    return `<div class="history-item">
+      <span style="font-weight:700;color:var(--gold);min-width:60px;">第${r.issue}期</span>
+      ${dateStr}
+      <div class="nums"><span class="num-tag ${wave}">${String(r.num).padStart(2,'0')}</span></div>
+      <span style="font-size:0.78em;color:var(--text-secondary);margin-left:4px;">${getZodiac(r.num)} ${getElement(r.num)} ${waveLabel} ${isOdd(r.num)?'单':'双'} ${isBig(r.num)?'大':'小'}</span>
+      <button class="btn btn-sm" style="background:#c0392b40;color:#e74c3c;padding:4px 8px;margin-left:auto;" onclick="deleteRecord(${i})">✕</button>
+    </div>`;
+  }).join('');
+}
+
+// ==================== 标签页 ====================
+
+function switchTab(tabName) {
+  document.querySelectorAll('#statTabs .tab').forEach(t => t.classList.remove('active'));
+  document.querySelector(`#statTabs .tab[data-tab="${tabName}"]`).classList.add('active');
+  renderTabContent();
+}
+
+function renderTabContent() {
+  const active = document.querySelector('#statTabs .tab.active').dataset.tab;
+  const div = document.getElementById('tabContent');
+  const history = loadHistory();
+  const numCounts = {};
+  history.forEach(r => { numCounts[r.num] = (numCounts[r.num] || 0) + 1; });
+
+  const total = history.length || 1;
+  const maxFreq = Math.max(...Object.values(numCounts), 1);
+
+  switch (active) {
+    case 'hotcold': renderHotCold(div, numCounts, maxFreq, total); break;
+    case 'oddeven': renderOddEven(div, history); break;
+    case 'wave': renderWave(div, history); break;
+    case 'zodiac': renderZodiac(div, history); break;
+  }
+}
+
+function renderHotCold(div, numCounts, maxFreq, total) {
+  if (Object.keys(numCounts).length === 0) {
+    div.innerHTML = '<div class="empty-state">暂无数据，请先录入历史开奖特码</div>';
+    return;
+  }
+  let html = '<div class="stat-grid">';
+  for (let n = 1; n <= 49; n++) {
+    const freq = numCounts[n] || 0;
+    const ratio = freq / maxFreq;
+    const wave = getWaveColor(n);
+    let cls = '';
+    if (freq === 0) cls = 'cold';
+    else if (ratio >= 0.7) cls = 'hot';
+    html += `<div class="stat-cell ${wave} ${cls}">
+      ${String(n).padStart(2,'0')}
+      <span class="freq">${freq}</span>
+    </div>`;
+  }
+  html += '</div>';
+  html += '<p style="text-align:center;margin-top:10px;font-size:0.8em;color:var(--text-secondary);">';
+  html += '<span style="opacity:0.45;">浅色=冷号(未开出)</span> · ';
+  html += '<span style="box-shadow:0 0 8px rgba(240,192,64,0.3);padding:2px 6px;border-radius:4px;">金光=热号(高频)</span>';
+  html += '</p>';
+  div.innerHTML = html;
+}
+
+function renderOddEven(div, history) {
+  if (history.length === 0) {
+    div.innerHTML = '<div class="empty-state">暂无数据，请先录入历史开奖特码</div>';
+    return;
+  }
+  let odd = 0, even = 0, big = 0, small = 0;
+  history.forEach(r => {
+    if (isOdd(r.num)) odd++; else even++;
+    if (isBig(r.num)) big++; else small++;
+  });
+  const total = history.length;
+  div.innerHTML = `
+    <div class="row" style="justify-content:space-around;gap:8px;">
+      <div style="text-align:center;flex:1;background:var(--input-bg);border-radius:10px;padding:12px;">
+        <div style="font-size:0.8em;color:var(--text-secondary);">单数</div>
+        <div style="font-size:1.4em;font-weight:700;color:#e94560;">${odd} <span style="font-size:0.5em;">(${(odd/total*100).toFixed(1)}%)</span></div>
+      </div>
+      <div style="text-align:center;flex:1;background:var(--input-bg);border-radius:10px;padding:12px;">
+        <div style="font-size:0.8em;color:var(--text-secondary);">双数</div>
+        <div style="font-size:1.4em;font-weight:700;color:#4d8cf5;">${even} <span style="font-size:0.5em;">(${(even/total*100).toFixed(1)}%)</span></div>
+      </div>
+      <div style="text-align:center;flex:1;background:var(--input-bg);border-radius:10px;padding:12px;">
+        <div style="font-size:0.8em;color:var(--text-secondary);">大数 (25-49)</div>
+        <div style="font-size:1.4em;font-weight:700;color:#f0c040;">${big} <span style="font-size:0.5em;">(${(big/total*100).toFixed(1)}%)</span></div>
+      </div>
+      <div style="text-align:center;flex:1;background:var(--input-bg);border-radius:10px;padding:12px;">
+        <div style="font-size:0.8em;color:var(--text-secondary);">小数 (1-24)</div>
+        <div style="font-size:1.4em;font-weight:700;color:#2ecc71;">${small} <span style="font-size:0.5em;">(${(small/total*100).toFixed(1)}%)</span></div>
+      </div>
+    </div>`;
+}
+
+function renderWave(div, history) {
+  if (history.length === 0) {
+    div.innerHTML = '<div class="empty-state">暂无数据，请先录入历史开奖特码</div>';
+    return;
+  }
+  let red = 0, blue = 0, green = 0;
+  history.forEach(r => {
+    const w = getWaveColor(r.num);
+    if (w === 'red') red++;
+    else if (w === 'blue') blue++;
+    else green++;
+  });
+  const total = history.length;
+  const maxVal = Math.max(red, blue, green, 1);
+  const bars = [
+    { label:'红波', val:red, pct:(red/total*100).toFixed(1), color:'#e94560', count: red },
+    { label:'蓝波', val:blue, pct:(blue/total*100).toFixed(1), color:'#4d8cf5', count: blue },
+    { label:'绿波', val:green, pct:(green/total*100).toFixed(1), color:'#2ecc71', count: green }
+  ];
+  div.innerHTML = bars.map(b => `
+    <div style="margin-bottom:10px;">
+      <div style="display:flex;justify-content:space-between;font-size:0.85em;margin-bottom:3px;">
+        <span>${b.label}</span><span>${b.count} 次 (${b.pct}%)</span>
+      </div>
+      <div style="background:var(--input-bg);border-radius:6px;height:20px;overflow:hidden;">
+        <div style="background:${b.color};height:100%;width:${(b.val/maxVal*100)}%;border-radius:6px;transition:width 0.5s;"></div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderZodiac(div, history) {
+  const zCounts = {};
+  for (let i = 1; i <= 49; i++) zCounts[getZodiac(i)] = 0;
+  history.forEach(r => { zCounts[getZodiac(r.num)]++; });
+
+  const zNumbers = getZodiacNumbers();
+  const sorted = Object.entries(zNumbers).map(([z, nums]) => ({
+    z, nums, count: zCounts[z] || 0
+  }));
+  sorted.sort((a,b) => ZODIAC.indexOf(a.z) - ZODIAC.indexOf(b.z));
+
+  const eCounts = {};
+  for (const e of Object.keys(ELEMENTS)) eCounts[e] = 0;
+  history.forEach(r => { eCounts[getElement(r.num)]++; });
+
+  let html = '<div style="margin-bottom:14px;"><strong>生肖分布</strong></div>';
+  html += '<div class="zodiac-grid">';
+  sorted.forEach(item => {
+    html += `<div class="zodiac-item">
+      <span class="icon">${ZODIAC_EMOJI[ZODIAC.indexOf(item.z)]}</span>
+      <div style="font-weight:700;">${item.z}</div>
+      <div style="color:#f0c040;font-size:0.82em;">${item.count}次</div>
+      <div class="nums">${item.nums.join('·')}</div>
+    </div>`;
+  });
+  html += '</div>';
+
+  html += '<div style="margin:16px 0 10px;"><strong>五行分布</strong></div>';
+  html += '<div class="elem-grid">';
+  for (const [el, nums] of Object.entries(ELEMENTS)) {
+    const count = eCounts[el] || 0;
+    html += `<div class="elem-item">
+      <span class="elem">${getElementEmoji(el)}</span>
+      <div style="font-weight:700;">${el}</div>
+      <div style="color:#f0c040;font-size:0.82em;">${count}次</div>
+      <div class="nums">${nums.join('·')}</div>
+    </div>`;
+  }
+  html += '</div>';
+
+  div.innerHTML = html;
+}
+
+// ==================== 初始化 ====================
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('drawDate').value = new Date().toISOString().split('T')[0];
+  renderHistory();
+
+  document.querySelectorAll('#statTabs .tab').forEach(tab => {
+    tab.addEventListener('click', () => switchTab(tab.dataset.tab));
+  });
+  renderTabContent();
+
+  // 默认生成一组
+  generateRandom();
+});
+</script>
+</body>
+</html>
