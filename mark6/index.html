@@ -95,7 +95,7 @@ input[type="number"]::-webkit-inner-spin-button { opacity: 1; }
 .result-meta { text-align: center; font-size: 0.85em; color: var(--text-secondary); margin-top: 6px; display: flex; flex-wrap: wrap; gap: 4px 12px; justify-content: center; }
 .result-meta span { display: inline-flex; align-items: center; gap: 3px; }
 
-.history-list { max-height: 240px; overflow-y: auto; }
+.history-list { max-height: 400px; overflow-y: auto; }
 .history-item {
   display: flex; justify-content: space-between; align-items: center;
   padding: 8px 12px; background: var(--input-bg); border-radius: 8px;
@@ -183,16 +183,17 @@ input[type="number"]::-webkit-inner-spin-button { opacity: 1; }
 
 <div class="container">
 
-  <!-- 随机选号 -->
+  <!-- 选号 -->
   <div class="card">
-    <div class="card-title">随机选号</div>
-    <div class="row" style="margin-bottom: 10px;">
-      <label style="font-size:0.85em; white-space:nowrap;">生成组数：</label>
-      <input type="number" id="randCount" value="1" min="1" max="20" style="flex:0 0 70px;">
-      <button class="btn btn-primary btn-sm" onclick="generateRandom()">生成特码</button>
+    <div class="card-title">选号</div>
+    <div class="row" style="margin-bottom: 8px;">
+      <input type="number" id="pickNum" placeholder="输入号码 1-49" min="1" max="49" style="flex:1;">
+      <button class="btn btn-primary btn-sm" onclick="addPick()">添加</button>
+      <button class="btn btn-secondary btn-sm" onclick="generateRandom()">随机</button>
     </div>
-    <div class="num-balls" id="randResult"></div>
-    <div class="result-meta" id="randMeta"></div>
+    <div class="num-balls" id="pickResult"></div>
+    <div class="result-meta" id="pickMeta"></div>
+    <button class="btn btn-danger btn-sm" style="margin-top:8px;" onclick="clearPick()">清空选号</button>
   </div>
 
   <!-- 手动录入 -->
@@ -220,6 +221,7 @@ input[type="number"]::-webkit-inner-spin-button { opacity: 1; }
       <div class="tab" data-tab="oddeven">单双大小</div>
       <div class="tab" data-tab="wave">波色分布</div>
       <div class="tab" data-tab="zodiac">生肖五行</div>
+      <div class="tab" data-tab="api">API图片</div>
     </div>
     <div id="tabContent"></div>
   </div>
@@ -297,12 +299,111 @@ function getElementEmoji(el) {
 function isOdd(n) { return n % 2 !== 0; }
 function isBig(n) { return n >= 25; }
 
+// ==================== 预置历史数据 ====================
+// 来源: 49图库 (https://lh5d3xb.xn--o39aq2kocs7t9pa67fswfw7e44m71lca664au8e.xn--mk1bu44c/)
+// 每期7个号码，第7个为特码
+// 数据范围: 第68期(2026-03-09) 至 第157期(2026-06-06)，共90期
+const EMBEDDED_HISTORY = [
+  {issue:157, date:"2026-06-06", num:40},
+  {issue:156, date:"2026-06-05", num:1},
+  {issue:155, date:"2026-06-04", num:7},
+  {issue:154, date:"2026-06-03", num:41},
+  {issue:153, date:"2026-06-02", num:41},
+  {issue:152, date:"2026-06-01", num:45},
+  {issue:151, date:"2026-05-31", num:31},
+  {issue:150, date:"2026-05-30", num:9},
+  {issue:149, date:"2026-05-29", num:27},
+  {issue:148, date:"2026-05-28", num:48},
+  {issue:147, date:"2026-05-27", num:13},
+  {issue:146, date:"2026-05-26", num:42},
+  {issue:145, date:"2026-05-25", num:5},
+  {issue:144, date:"2026-05-24", num:43},
+  {issue:143, date:"2026-05-23", num:44},
+  {issue:142, date:"2026-05-22", num:23},
+  {issue:141, date:"2026-05-21", num:33},
+  {issue:140, date:"2026-05-20", num:16},
+  {issue:139, date:"2026-05-19", num:24},
+  {issue:138, date:"2026-05-18", num:49},
+  {issue:137, date:"2026-05-17", num:26},
+  {issue:136, date:"2026-05-16", num:48},
+  {issue:135, date:"2026-05-15", num:30},
+  {issue:134, date:"2026-05-14", num:37},
+  {issue:133, date:"2026-05-13", num:7},
+  {issue:132, date:"2026-05-12", num:30},
+  {issue:131, date:"2026-05-11", num:7},
+  {issue:130, date:"2026-05-10", num:29},
+  {issue:129, date:"2026-05-09", num:41},
+  {issue:128, date:"2026-05-08", num:37},
+  {issue:127, date:"2026-05-07", num:45},
+  {issue:126, date:"2026-05-06", num:49},
+  {issue:125, date:"2026-05-05", num:31},
+  {issue:124, date:"2026-05-04", num:39},
+  {issue:123, date:"2026-05-03", num:46},
+  {issue:122, date:"2026-05-02", num:1},
+  {issue:121, date:"2026-05-01", num:44},
+  {issue:120, date:"2026-04-30", num:6},
+  {issue:119, date:"2026-04-29", num:11},
+  {issue:118, date:"2026-04-28", num:8},
+  {issue:117, date:"2026-04-27", num:16},
+  {issue:116, date:"2026-04-26", num:22},
+  {issue:115, date:"2026-04-25", num:4},
+  {issue:114, date:"2026-04-24", num:30},
+  {issue:113, date:"2026-04-23", num:2},
+  {issue:112, date:"2026-04-22", num:9},
+  {issue:111, date:"2026-04-21", num:1},
+  {issue:110, date:"2026-04-20", num:30},
+  {issue:109, date:"2026-04-19", num:16},
+  {issue:108, date:"2026-04-18", num:45},
+  {issue:107, date:"2026-04-17", num:49},
+  {issue:106, date:"2026-04-16", num:22},
+  {issue:105, date:"2026-04-15", num:28},
+  {issue:104, date:"2026-04-14", num:1},
+  {issue:103, date:"2026-04-13", num:6},
+  {issue:102, date:"2026-04-12", num:20},
+  {issue:101, date:"2026-04-11", num:39},
+  {issue:100, date:"2026-04-10", num:33},
+  {issue:99, date:"2026-04-09", num:12},
+  {issue:98, date:"2026-04-08", num:17},
+  {issue:97, date:"2026-04-07", num:11},
+  {issue:96, date:"2026-04-06", num:43},
+  {issue:95, date:"2026-04-05", num:35},
+  {issue:94, date:"2026-04-04", num:17},
+  {issue:93, date:"2026-04-03", num:40},
+  {issue:92, date:"2026-04-02", num:6},
+  {issue:91, date:"2026-04-01", num:37},
+  {issue:90, date:"2026-03-31", num:36},
+  {issue:89, date:"2026-03-30", num:49},
+  {issue:88, date:"2026-03-29", num:27},
+  {issue:87, date:"2026-03-28", num:26},
+  {issue:86, date:"2026-03-27", num:12},
+  {issue:85, date:"2026-03-26", num:19},
+  {issue:84, date:"2026-03-25", num:16},
+  {issue:83, date:"2026-03-24", num:5},
+  {issue:82, date:"2026-03-23", num:27},
+  {issue:81, date:"2026-03-22", num:17},
+  {issue:80, date:"2026-03-21", num:3},
+  {issue:79, date:"2026-03-20", num:35},
+  {issue:78, date:"2026-03-19", num:46},
+  {issue:77, date:"2026-03-18", num:29},
+  {issue:76, date:"2026-03-17", num:2},
+  {issue:75, date:"2026-03-16", num:33},
+  {issue:74, date:"2026-03-15", num:10},
+  {issue:73, date:"2026-03-14", num:34},
+  {issue:72, date:"2026-03-13", num:46},
+  {issue:71, date:"2026-03-12", num:48},
+  {issue:70, date:"2026-03-11", num:25},
+  {issue:69, date:"2026-03-10", num:24},
+  {issue:68, date:"2026-03-09", num:23},
+];
+
 // ==================== localStorage ====================
 
 function loadHistory() {
   try {
-    return JSON.parse(localStorage.getItem('mark6_history') || '[]');
-  } catch(e) { return []; }
+    const stored = localStorage.getItem('mark6_history');
+    if (stored) return JSON.parse(stored);
+    return EMBEDDED_HISTORY;
+  } catch(e) { return EMBEDDED_HISTORY; }
 }
 
 function saveHistory(data) {
@@ -319,37 +420,74 @@ function showToast(msg) {
   t._timeout = setTimeout(() => t.classList.remove('show'), 1800);
 }
 
-// ==================== 随机选号 ====================
+// ==================== 选号 ====================
+
+let pickedNums = [];
+
+function addPick() {
+  const input = document.getElementById('pickNum');
+  const n = parseInt(input.value);
+  if (!n || n < 1 || n > 49) { showToast('号码范围 1-49'); return; }
+  if (pickedNums.includes(n)) { showToast('号码已存在'); return; }
+  pickedNums.push(n);
+  pickedNums.sort((a, b) => a - b);
+  input.value = '';
+  renderPick();
+}
 
 function generateRandom() {
-  const count = Math.min(Math.max(parseInt(document.getElementById('randCount').value) || 1, 1), 20);
-  const nums = [];
-  const used = new Set();
-  while (nums.length < count) {
-    const n = Math.floor(Math.random() * 49) + 1;
-    if (!used.has(n)) { used.add(n); nums.push(n); }
-  }
-  nums.sort((a,b) => a-b);
+  const used = new Set(pickedNums);
+  const available = [];
+  for (let i = 1; i <= 49; i++) { if (!used.has(i)) available.push(i); }
+  if (available.length === 0) { showToast('49个号码已全部选中'); return; }
+  const n = available[Math.floor(Math.random() * available.length)];
+  pickedNums.push(n);
+  pickedNums.sort((a, b) => a - b);
+  renderPick();
+}
 
-  const ballsDiv = document.getElementById('randResult');
-  const metaDiv = document.getElementById('randMeta');
+function removePick(n) {
+  pickedNums = pickedNums.filter(x => x !== n);
+  renderPick();
+}
+
+function clearPick() {
+  pickedNums = [];
+  renderPick();
+}
+
+function renderPick() {
+  const ballsDiv = document.getElementById('pickResult');
+  const metaDiv = document.getElementById('pickMeta');
   ballsDiv.innerHTML = '';
-  const metaParts = [];
 
-  nums.forEach(n => {
+  if (pickedNums.length === 0) {
+    metaDiv.innerHTML = '<span style="color:var(--text-secondary);">请添加号码或点击随机</span>';
+    return;
+  }
+
+  pickedNums.forEach(n => {
     const wave = getWaveColor(n);
     const ball = document.createElement('div');
     ball.className = `num-ball ${wave}`;
     ball.textContent = n;
+    ball.style.cursor = 'pointer';
+    ball.title = '点击移除';
+    ball.addEventListener('click', () => removePick(n));
     ballsDiv.appendChild(ball);
+  });
 
-    metaParts.push(`<span>🐉 ${getZodiac(n)}</span>`);
+  const metaParts = [];
+  pickedNums.forEach(n => {
+    const wave = getWaveColor(n);
+    metaParts.push(`<span>${getZodiac(n)}</span>`);
     metaParts.push(`<span>${getElementEmoji(getElement(n))} ${getElement(n)}</span>`);
     metaParts.push(`<span class="badge badge-${wave}">${wave==='red'?'红波':wave==='blue'?'蓝波':'绿波'}</span>`);
     metaParts.push(`<span>${isOdd(n)?'单':'双'}</span>`);
     metaParts.push(`<span>${isBig(n)?'大':'小'}</span>`);
+    metaParts.push('<span style="color:var(--border);">|</span>');
   });
-
+  metaParts.pop(); // 移除最后一个分隔符
   metaDiv.innerHTML = metaParts.join('');
 }
 
@@ -439,6 +577,7 @@ function renderTabContent() {
     case 'oddeven': renderOddEven(div, history); break;
     case 'wave': renderWave(div, history); break;
     case 'zodiac': renderZodiac(div, history); break;
+    case 'api': renderApiImages(div); break;
   }
 }
 
@@ -574,6 +713,57 @@ function renderZodiac(div, history) {
   div.innerHTML = html;
 }
 
+// ==================== API图片 ====================
+
+async function renderApiImages(div) {
+  div.innerHTML = `
+    <div class="row" style="margin-bottom:10px;gap:6px;">
+      <select id="apiLotteryType" style="flex:1;font-size:0.85em;">
+        <option value="2" selected>澳门六合彩</option>
+        <option value="1">香港六合彩</option>
+        <option value="3">台湾六合彩</option>
+        <option value="4">新加坡六合彩</option>
+      </select>
+      <input type="number" id="apiPageNum" value="1" min="1" style="flex:0 0 55px;font-size:0.85em;" placeholder="页">
+      <button class="btn btn-primary btn-sm" onclick="loadApiImages()">加载</button>
+    </div>
+    <div id="apiImageList" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;">
+      <div class="empty-state">点击「加载」获取最新走势图</div>
+    </div>
+  `;
+}
+
+async function loadApiImages() {
+  const type = document.getElementById('apiLotteryType').value;
+  const page = document.getElementById('apiPageNum').value || 1;
+  const container = document.getElementById('apiImageList');
+  container.innerHTML = '<div class="empty-state">加载中...</div>';
+
+  const url = `https://api.bnzc.net/api/getPictureType?lotteryType=${type}&pageSize=20&pageNum=${page}`;
+
+  try {
+    const resp = await fetch(url, { method: 'GET' });
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    const data = await resp.json();
+    if (!data || !Array.isArray(data) || data.length === 0) {
+      container.innerHTML = '<div class="empty-state">暂无图片数据</div>';
+      return;
+    }
+    container.innerHTML = data.map(item => {
+      const imgUrl = item.pictureUrl || '';
+      const name = item.pictureName || '走势图';
+      return imgUrl
+        ? `<div style="background:var(--input-bg);border-radius:8px;overflow:hidden;text-align:center;">
+            <img src="${imgUrl}" alt="${name}" style="width:100%;display:block;" loading="lazy" onerror="this.parentElement.innerHTML='<div class=\\'empty-state\\' style=\\'padding:20px;\\'>加载失败</div>'">
+            <div style="padding:4px 6px;font-size:0.75em;color:var(--text-secondary);">${name} ${item.year||''}</div>
+           </div>`
+        : '';
+    }).join('');
+  } catch (e) {
+    container.innerHTML = `<div class="empty-state">API请求失败：${e.message}<br><span style="font-size:0.8em;">接口可能暂不可用，请稍后重试</span></div>`;
+  }
+}
+
 // ==================== 初始化 ====================
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -584,9 +774,7 @@ document.addEventListener('DOMContentLoaded', () => {
     tab.addEventListener('click', () => switchTab(tab.dataset.tab));
   });
   renderTabContent();
-
-  // 默认生成一组
-  generateRandom();
+  renderPick();
 });
 </script>
 </body>
