@@ -16,7 +16,6 @@
     background: linear-gradient(135deg, #1a2a3a 0%, #0d1b2a 40%, #1b2838 100%);
     padding: 48px 24px 36px;
     text-align: center;
-    border-bottom: 3px solid #f97316;
     position: relative;
     overflow: hidden;
   }
@@ -49,16 +48,22 @@
     font-size: 15px;
     position: relative;
   }
+  .header-sticky {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background-color: #0f1923;
+    border-bottom: 3px solid #f97316;
+  }
   .container {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 24px 16px 40px;
+    padding: 16px 16px 40px;
   }
   .stats {
     display: flex;
     justify-content: center;
     gap: 32px;
-    margin-bottom: 32px;
     flex-wrap: wrap;
   }
   .stat-item {
@@ -172,19 +177,20 @@
 </head>
 <body>
 
-<div class="hero">
+<div class="header-sticky">
+  <div class="hero">
   <h1>少儿篮球训练 · 二十节教学合集</h1>
   <div class="author">制作者：何孟麒</div>
   <p class="subtitle">从球感入门到综合实战，系统掌握篮球基本功</p>
 </div>
-
-<div class="container">
   <div class="stats">
     <div class="stat-item"><div class="num">20</div><div class="label">教学课时</div></div>
     <div class="stat-item"><div class="num">471 MB</div><div class="label">视频总量</div></div>
     <div class="stat-item"><div class="num">5</div><div class="label">技能模块</div></div>
   </div>
+</div>
 
+<div class="container">
   <div class="video-grid">
     <div class="video-card">
       <div class="card-header"><span class="episode">第01课</span><span class="title">活动准备</span></div>
