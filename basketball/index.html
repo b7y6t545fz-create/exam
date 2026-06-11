@@ -297,5 +297,31 @@
   <p class="note">少儿篮球训练 · 二十节完整教学 | 视频存放于「篮球教学视频」文件夹，使用相对路径引用，可离线使用</p>
 </div>
 
+<script>
+(function() {
+  var videos = document.querySelectorAll('video');
+  videos.forEach(function(video) {
+    video.addEventListener('play', function() {
+      if (video.requestFullscreen) {
+        video.requestFullscreen().catch(function() {});
+      } else if (video.webkitRequestFullscreen) {
+        video.webkitRequestFullscreen();
+      } else if (video.webkitEnterFullscreen) {
+        video.webkitEnterFullscreen();
+      }
+    });
+    video.addEventListener('click', function(e) {
+      if (video.requestFullscreen) {
+        video.requestFullscreen().catch(function() {});
+      } else if (video.webkitRequestFullscreen) {
+        video.webkitRequestFullscreen();
+      } else if (video.webkitEnterFullscreen) {
+        video.webkitEnterFullscreen();
+      }
+    });
+  });
+})();
+</script>
+
 </body>
 </html>
