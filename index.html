@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
@@ -26,8 +26,8 @@
         transparent 0px, rgba(0,0,0,.06) 1px, transparent 2px,
         transparent 40px, rgba(0,0,0,.04) 41px, transparent 42px
       ),
-      /* 底色叠层 */
-      linear-gradient(180deg, #3a2518 0%, #4d321c 50%, #2e1a10 100%);
+      /* 深色叠层 */
+      linear-gradient(180deg, #1a0f08 0%, #2a1a10 40%, #0d0804 100%);
     background-blend-mode: overlay, overlay, normal;
   }
 
@@ -53,18 +53,14 @@
     opacity: .7;
   }
 
-  /* ── 顶部 Hero 区域（固定）── */
+  /* ── 顶部 Hero 区域 ── */
   .hero {
-    position: sticky;
-    top: 0;
-    z-index: 50;
-    padding: 32px 24px 20px;
+    position: relative;
+    z-index: 1;
+    padding: 64px 24px 44px;
     text-align: center;
     overflow: hidden;
-    background: linear-gradient(180deg, rgba(15,7,3,.96) 0%, rgba(25,12,6,.9) 80%, rgba(25,12,6,.85) 100%);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border-bottom: 2px solid rgba(249,115,22,.15);
+    background: linear-gradient(180deg, rgba(10,5,2,.75) 0%, rgba(20,10,5,.6) 50%, rgba(10,5,2,.4) 100%);
   }
   /* 篮球水印 */
   .hero .ball-watermark {
@@ -122,29 +118,34 @@
     opacity: .7;
   }
 
-  .hero .stats-row {
-    position: relative;
+  /* ── 顶部吸附条 ── */
+  .sticky-bar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(15,7,3,.94);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-bottom: 2px solid #f97316;
+    padding: 10px 24px;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 16px;
     font-size: 13px;
     color: #998877;
-    margin-top: 16px;
-    padding-top: 16px;
-    border-top: 1px solid rgba(249,115,22,.12);
   }
-  .hero .stats-row span {
+  .sticky-bar span {
     display: flex;
     align-items: center;
     gap: 6px;
   }
-  .hero .stats-row .count {
+  .sticky-bar .count {
     color: #f97316;
     font-weight: 700;
     font-size: 16px;
   }
-  .hero .stats-row .separator {
+  .sticky-bar .separator {
     width: 4px;
     height: 4px;
     background: #f97316;
@@ -324,29 +325,11 @@
     opacity: .6;
   }
 
-  /* ── 视频加载指示器 ── */
-  .video-wrapper { position: relative; }
-  .video-wrapper::after {
-    content: "";
-    position: absolute;
-    top: 50%; left: 50%;
-    width: 40px; height: 40px;
-    margin: -20px 0 0 -20px;
-    border: 3px solid rgba(255,255,255,.2);
-    border-top-color: #f97316;
-    border-radius: 50%;
-    animation: spin .8s linear infinite;
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity .3s;
-  }
-  .video-wrapper.loading::after { opacity: 1; }
-  @keyframes spin { to { transform: rotate(360deg); } }
-
   /* ── 响应式 ── */
   @media (max-width: 480px) {
     .video-grid { grid-template-columns: 1fr; }
-    .hero { padding: 24px 16px 16px; }
+    .hero { padding: 40px 16px 28px; }
+    .sticky-bar { font-size: 11px; gap: 8px; padding: 8px 16px; }
   }
 </style>
 </head>
@@ -362,117 +345,118 @@
   <div class="tagline">SYSTEMATIC TRAINING</div>
   <p class="subtitle">从球感入门到综合实战，系统掌握篮球基本功</p>
   <p class="author">制作者：何孟麒</p>
-  <div class="stats-row">
-    <span><span class="count">20</span> 课时</span>
-    <span class="separator"></span>
-    <span>系统教学</span>
-    <span class="separator"></span>
-    <span>循序渐进</span>
-    <span class="separator"></span>
-    <span>少儿专属</span>
-  </div>
 </header>
+
+<div class="sticky-bar">
+  <span><span class="count">20</span> 课时</span>
+  <span class="separator"></span>
+  <span>系统教学</span>
+  <span class="separator"></span>
+  <span>循序渐进</span>
+  <span class="separator"></span>
+  <span>少儿专属</span>
+</div>
 
 <div class="container">
   <div class="video-grid">
     <div class="video-card">
       <div class="card-header"><span class="episode">01</span><span class="title">活动准备</span></div>
-      <div class="video-wrapper"><video playsinline webkit-playsinline controls preload="metadata" src="videos/%E7%AC%AC01%E8%AF%BE%20%E6%B4%BB%E5%8A%A8%E5%87%86%E5%A4%87.mp4"></video></div>
+      <div class="video-wrapper"><video playsinline webkit-playsinline controls preload="none" src="https://cdn.jsdelivr.net/gh/b7y6t545fz-create/exam@main/basketball/videos/%E7%AC%AC01%E8%AF%BE%20%E6%B4%BB%E5%8A%A8%E5%87%86%E5%A4%87.mp4"></video></div>
       <div class="card-footer"><span class="skill-tag">入门热身</span><button class="btn-play" onclick="this.parentElement.parentElement.querySelector('video').play()">播放</button></div>
     </div>
     <div class="video-card">
       <div class="card-header"><span class="episode">02</span><span class="title">熟悉球感</span></div>
-      <div class="video-wrapper"><video playsinline webkit-playsinline controls preload="metadata" src="videos/%E7%AC%AC02%E8%AF%BE%20%E7%86%9F%E6%82%89%E7%90%83%E6%84%9F.mp4"></video></div>
+      <div class="video-wrapper"><video playsinline webkit-playsinline controls preload="none" src="https://cdn.jsdelivr.net/gh/b7y6t545fz-create/exam@main/basketball/videos/%E7%AC%AC02%E8%AF%BE%20%E7%86%9F%E6%82%89%E7%90%83%E6%84%9F.mp4"></video></div>
       <div class="card-footer"><span class="skill-tag">控球基础</span><button class="btn-play" onclick="this.parentElement.parentElement.querySelector('video').play()">播放</button></div>
     </div>
     <div class="video-card">
       <div class="card-header"><span class="episode">03</span><span class="title">原地运球</span></div>
-      <div class="video-wrapper"><video playsinline webkit-playsinline controls preload="metadata" src="videos/%E7%AC%AC03%E8%AF%BE%20%E5%8E%9F%E5%9C%B0%E8%BF%90%E7%90%83.mp4"></video></div>
+      <div class="video-wrapper"><video playsinline webkit-playsinline controls preload="none" src="https://cdn.jsdelivr.net/gh/b7y6t545fz-create/exam@main/basketball/videos/%E7%AC%AC03%E8%AF%BE%20%E5%8E%9F%E5%9C%B0%E8%BF%90%E7%90%83.mp4"></video></div>
       <div class="card-footer"><span class="skill-tag">运球基础</span><button class="btn-play" onclick="this.parentElement.parentElement.querySelector('video').play()">播放</button></div>
     </div>
     <div class="video-card">
       <div class="card-header"><span class="episode">04</span><span class="title">单手高低运球</span></div>
-      <div class="video-wrapper"><video playsinline webkit-playsinline controls preload="metadata" src="videos/%E7%AC%AC04%E8%AF%BE%20%E5%8D%95%E6%89%8B%E9%AB%98%E4%BD%8E%E8%BF%90%E7%90%83.mp4"></video></div>
+      <div class="video-wrapper"><video playsinline webkit-playsinline controls preload="none" src="https://cdn.jsdelivr.net/gh/b7y6t545fz-create/exam@main/basketball/videos/%E7%AC%AC04%E8%AF%BE%20%E5%8D%95%E6%89%8B%E9%AB%98%E4%BD%8E%E8%BF%90%E7%90%83.mp4"></video></div>
       <div class="card-footer"><span class="skill-tag">运球进阶</span><button class="btn-play" onclick="this.parentElement.parentElement.querySelector('video').play()">播放</button></div>
     </div>
     <div class="video-card">
       <div class="card-header"><span class="episode">05</span><span class="title">变向运球</span></div>
-      <div class="video-wrapper"><video playsinline webkit-playsinline controls preload="metadata" src="videos/%E7%AC%AC05%E8%AF%BE%20%E5%8F%98%E5%90%91%E8%BF%90%E7%90%83.mp4"></video></div>
+      <div class="video-wrapper"><video playsinline webkit-playsinline controls preload="none" src="https://cdn.jsdelivr.net/gh/b7y6t545fz-create/exam@main/basketball/videos/%E7%AC%AC05%E8%AF%BE%20%E5%8F%98%E5%90%91%E8%BF%90%E7%90%83.mp4"></video></div>
       <div class="card-footer"><span class="skill-tag">运球技巧</span><button class="btn-play" onclick="this.parentElement.parentElement.querySelector('video').play()">播放</button></div>
     </div>
     <div class="video-card">
       <div class="card-header"><span class="episode">06</span><span class="title">胯下运球</span></div>
-      <div class="video-wrapper"><video playsinline webkit-playsinline controls preload="metadata" src="videos/%E7%AC%AC06%E8%AF%BE%20%E8%83%AF%E4%B8%8B%E8%BF%90%E7%90%83.mp4"></video></div>
+      <div class="video-wrapper"><video playsinline webkit-playsinline controls preload="none" src="https://cdn.jsdelivr.net/gh/b7y6t545fz-create/exam@main/basketball/videos/%E7%AC%AC06%E8%AF%BE%20%E8%83%AF%E4%B8%8B%E8%BF%90%E7%90%83.mp4"></video></div>
       <div class="card-footer"><span class="skill-tag">运球技巧</span><button class="btn-play" onclick="this.parentElement.parentElement.querySelector('video').play()">播放</button></div>
     </div>
     <div class="video-card">
       <div class="card-header"><span class="episode">07</span><span class="title">背后运球</span></div>
-      <div class="video-wrapper"><video playsinline webkit-playsinline controls preload="metadata" src="videos/%E7%AC%AC07%E8%AF%BE%20%E8%83%8C%E5%90%8E%E8%BF%90%E7%90%83.mp4"></video></div>
+      <div class="video-wrapper"><video playsinline webkit-playsinline controls preload="none" src="https://cdn.jsdelivr.net/gh/b7y6t545fz-create/exam@main/basketball/videos/%E7%AC%AC07%E8%AF%BE%20%E8%83%8C%E5%90%8E%E8%BF%90%E7%90%83.mp4"></video></div>
       <div class="card-footer"><span class="skill-tag">运球技巧</span><button class="btn-play" onclick="this.parentElement.parentElement.querySelector('video').play()">播放</button></div>
     </div>
     <div class="video-card">
       <div class="card-header"><span class="episode">08</span><span class="title">跳步急停</span></div>
-      <div class="video-wrapper"><video playsinline webkit-playsinline controls preload="metadata" src="videos/%E7%AC%AC08%E8%AF%BE%20%E8%B7%B3%E6%AD%A5%E6%80%A5%E5%81%9C.mp4"></video></div>
+      <div class="video-wrapper"><video playsinline webkit-playsinline controls preload="none" src="https://cdn.jsdelivr.net/gh/b7y6t545fz-create/exam@main/basketball/videos/%E7%AC%AC08%E8%AF%BE%20%E8%B7%B3%E6%AD%A5%E6%80%A5%E5%81%9C.mp4"></video></div>
       <div class="card-footer"><span class="skill-tag">脚步动作</span><button class="btn-play" onclick="this.parentElement.parentElement.querySelector('video').play()">播放</button></div>
     </div>
     <div class="video-card">
       <div class="card-header"><span class="episode">09</span><span class="title">两步急停</span></div>
-      <div class="video-wrapper"><video playsinline webkit-playsinline controls preload="metadata" src="videos/%E7%AC%AC09%E8%AF%BE%20%E4%B8%A4%E6%AD%A5%E6%80%A5%E5%81%9C.mp4"></video></div>
+      <div class="video-wrapper"><video playsinline webkit-playsinline controls preload="none" src="https://cdn.jsdelivr.net/gh/b7y6t545fz-create/exam@main/basketball/videos/%E7%AC%AC09%E8%AF%BE%20%E4%B8%A4%E6%AD%A5%E6%80%A5%E5%81%9C.mp4"></video></div>
       <div class="card-footer"><span class="skill-tag">脚步动作</span><button class="btn-play" onclick="this.parentElement.parentElement.querySelector('video').play()">播放</button></div>
     </div>
     <div class="video-card">
       <div class="card-header"><span class="episode">10</span><span class="title">运球急停</span></div>
-      <div class="video-wrapper"><video playsinline webkit-playsinline controls preload="metadata" src="videos/%E7%AC%AC10%E8%AF%BE%20%E8%BF%90%E7%90%83%E6%80%A5%E5%81%9C.mp4"></video></div>
+      <div class="video-wrapper"><video playsinline webkit-playsinline controls preload="none" src="https://cdn.jsdelivr.net/gh/b7y6t545fz-create/exam@main/basketball/videos/%E7%AC%AC10%E8%AF%BE%20%E8%BF%90%E7%90%83%E6%80%A5%E5%81%9C.mp4"></video></div>
       <div class="card-footer"><span class="skill-tag">组合技术</span><button class="btn-play" onclick="this.parentElement.parentElement.querySelector('video').play()">播放</button></div>
     </div>
     <div class="video-card">
       <div class="card-header"><span class="episode">11</span><span class="title">运球急起</span></div>
-      <div class="video-wrapper"><video playsinline webkit-playsinline controls preload="metadata" src="videos/%E7%AC%AC11%E8%AF%BE%20%E8%BF%90%E7%90%83%E6%80%A5%E8%B5%B7.mp4"></video></div>
+      <div class="video-wrapper"><video playsinline webkit-playsinline controls preload="none" src="https://cdn.jsdelivr.net/gh/b7y6t545fz-create/exam@main/basketball/videos/%E7%AC%AC11%E8%AF%BE%20%E8%BF%90%E7%90%83%E6%80%A5%E8%B5%B7.mp4"></video></div>
       <div class="card-footer"><span class="skill-tag">组合技术</span><button class="btn-play" onclick="this.parentElement.parentElement.querySelector('video').play()">播放</button></div>
     </div>
     <div class="video-card">
       <div class="card-header"><span class="episode shooting">12</span><span class="title">投篮姿势</span></div>
-      <div class="video-wrapper"><video playsinline webkit-playsinline controls preload="metadata" src="videos/%E7%AC%AC12%E8%AF%BE%20%E6%8A%95%E7%AF%AE%E5%A7%BF%E5%8A%BF.mp4"></video></div>
+      <div class="video-wrapper"><video playsinline webkit-playsinline controls preload="none" src="https://cdn.jsdelivr.net/gh/b7y6t545fz-create/exam@main/basketball/videos/%E7%AC%AC12%E8%AF%BE%20%E6%8A%95%E7%AF%AE%E5%A7%BF%E5%8A%BF.mp4"></video></div>
       <div class="card-footer"><span class="skill-tag">投篮基础</span><button class="btn-play" onclick="this.parentElement.parentElement.querySelector('video').play()">播放</button></div>
     </div>
     <div class="video-card">
       <div class="card-header"><span class="episode shooting">13</span><span class="title">篮下投球</span></div>
-      <div class="video-wrapper"><video playsinline webkit-playsinline controls preload="metadata" src="videos/%E7%AC%AC13%E8%AF%BE%20%E7%AF%AE%E4%B8%8B%E6%8A%95%E7%90%83.mp4"></video></div>
+      <div class="video-wrapper"><video playsinline webkit-playsinline controls preload="none" src="https://cdn.jsdelivr.net/gh/b7y6t545fz-create/exam@main/basketball/videos/%E7%AC%AC13%E8%AF%BE%20%E7%AF%AE%E4%B8%8B%E6%8A%95%E7%90%83.mp4"></video></div>
       <div class="card-footer"><span class="skill-tag">投篮实战</span><button class="btn-play" onclick="this.parentElement.parentElement.querySelector('video').play()">播放</button></div>
     </div>
     <div class="video-card">
       <div class="card-header"><span class="episode">14</span><span class="title">运球投篮</span></div>
-      <div class="video-wrapper"><video playsinline webkit-playsinline controls preload="metadata" src="videos/%E7%AC%AC14%E8%AF%BE%20%E8%BF%90%E7%90%83%E6%8A%95%E7%AF%AE.mp4"></video></div>
+      <div class="video-wrapper"><video playsinline webkit-playsinline controls preload="none" src="https://cdn.jsdelivr.net/gh/b7y6t545fz-create/exam@main/basketball/videos/%E7%AC%AC14%E8%AF%BE%20%E8%BF%90%E7%90%83%E6%8A%95%E7%AF%AE.mp4"></video></div>
       <div class="card-footer"><span class="skill-tag">组合技术</span><button class="btn-play" onclick="this.parentElement.parentElement.querySelector('video').play()">播放</button></div>
     </div>
     <div class="video-card">
       <div class="card-header"><span class="episode pass">15</span><span class="title">胸前传球</span></div>
-      <div class="video-wrapper"><video playsinline webkit-playsinline controls preload="metadata" src="videos/%E7%AC%AC15%E8%AF%BE%20%E8%83%B8%E5%89%8D%E4%BC%A0%E7%90%83.mp4"></video></div>
+      <div class="video-wrapper"><video playsinline webkit-playsinline controls preload="none" src="https://cdn.jsdelivr.net/gh/b7y6t545fz-create/exam@main/basketball/videos/%E7%AC%AC15%E8%AF%BE%20%E8%83%B8%E5%89%8D%E4%BC%A0%E7%90%83.mp4"></video></div>
       <div class="card-footer"><span class="skill-tag">传球基础</span><button class="btn-play" onclick="this.parentElement.parentElement.querySelector('video').play()">播放</button></div>
     </div>
     <div class="video-card">
       <div class="card-header"><span class="episode pass">16</span><span class="title">击地传球</span></div>
-      <div class="video-wrapper"><video playsinline webkit-playsinline controls preload="metadata" src="videos/%E7%AC%AC16%E8%AF%BE%20%E5%87%BB%E5%9C%B0%E4%BC%A0%E7%90%83.mp4"></video></div>
+      <div class="video-wrapper"><video playsinline webkit-playsinline controls preload="none" src="https://cdn.jsdelivr.net/gh/b7y6t545fz-create/exam@main/basketball/videos/%E7%AC%AC16%E8%AF%BE%20%E5%87%BB%E5%9C%B0%E4%BC%A0%E7%90%83.mp4"></video></div>
       <div class="card-footer"><span class="skill-tag">传球技巧</span><button class="btn-play" onclick="this.parentElement.parentElement.querySelector('video').play()">播放</button></div>
     </div>
     <div class="video-card">
       <div class="card-header"><span class="episode shooting">17</span><span class="title">三步上篮</span></div>
-      <div class="video-wrapper"><video playsinline webkit-playsinline controls preload="metadata" src="videos/%E7%AC%AC17%E8%AF%BE%20%E4%B8%89%E6%AD%A5%E4%B8%8A%E7%AF%AE.mp4"></video></div>
+      <div class="video-wrapper"><video playsinline webkit-playsinline controls preload="none" src="https://cdn.jsdelivr.net/gh/b7y6t545fz-create/exam@main/basketball/videos/%E7%AC%AC17%E8%AF%BE%20%E4%B8%89%E6%AD%A5%E4%B8%8A%E7%AF%AE.mp4"></video></div>
       <div class="card-footer"><span class="skill-tag">上篮技术</span><button class="btn-play" onclick="this.parentElement.parentElement.querySelector('video').play()">播放</button></div>
     </div>
     <div class="video-card">
       <div class="card-header"><span class="episode review">18</span><span class="title">熟悉所有运球</span></div>
-      <div class="video-wrapper"><video playsinline webkit-playsinline controls preload="metadata" src="videos/%E7%AC%AC18%E8%AF%BE%20%E7%86%9F%E6%82%89%E6%89%80%E6%9C%89%E8%BF%90%E7%90%83.mp4"></video></div>
+      <div class="video-wrapper"><video playsinline webkit-playsinline controls preload="none" src="https://cdn.jsdelivr.net/gh/b7y6t545fz-create/exam@main/basketball/videos/%E7%AC%AC18%E8%AF%BE%20%E7%86%9F%E6%82%89%E6%89%80%E6%9C%89%E8%BF%90%E7%90%83.mp4"></video></div>
       <div class="card-footer"><span class="skill-tag">综合复习</span><button class="btn-play" onclick="this.parentElement.parentElement.querySelector('video').play()">播放</button></div>
     </div>
     <div class="video-card">
       <div class="card-header"><span class="episode review">19</span><span class="title">熟悉所有投篮</span></div>
-      <div class="video-wrapper"><video playsinline webkit-playsinline controls preload="metadata" src="videos/%E7%AC%AC19%E8%AF%BE%20%E7%86%9F%E6%82%89%E6%89%80%E6%9C%89%E6%8A%95%E7%AF%AE.mp4"></video></div>
+      <div class="video-wrapper"><video playsinline webkit-playsinline controls preload="none" src="https://cdn.jsdelivr.net/gh/b7y6t545fz-create/exam@main/basketball/videos/%E7%AC%AC19%E8%AF%BE%20%E7%86%9F%E6%82%89%E6%89%80%E6%9C%89%E6%8A%95%E7%AF%AE.mp4"></video></div>
       <div class="card-footer"><span class="skill-tag">综合复习</span><button class="btn-play" onclick="this.parentElement.parentElement.querySelector('video').play()">播放</button></div>
     </div>
     <div class="video-card">
       <div class="card-header"><span class="episode review">20</span><span class="title">复习总结回顾</span></div>
-      <div class="video-wrapper"><video playsinline webkit-playsinline controls preload="metadata" src="videos/%E7%AC%AC20%E8%AF%BE%20%E5%A4%8D%E4%B9%A0%E6%80%BB%E7%BB%93%E5%9B%9E%E9%A1%BE.mp4"></video></div>
+      <div class="video-wrapper"><video playsinline webkit-playsinline controls preload="none" src="https://cdn.jsdelivr.net/gh/b7y6t545fz-create/exam@main/basketball/videos/%E7%AC%AC20%E8%AF%BE%20%E5%A4%8D%E4%B9%A0%E6%80%BB%E7%BB%93%E5%9B%9E%E9%A1%BE.mp4"></video></div>
       <div class="card-footer"><span class="skill-tag">总复习</span><button class="btn-play" onclick="this.parentElement.parentElement.querySelector('video').play()">播放</button></div>
     </div>
   </div>
@@ -489,14 +473,6 @@
 (function() {
   var videos = document.querySelectorAll('video');
   videos.forEach(function(video) {
-    // 加载状态指示
-    var wrapper = video.parentElement;
-    video.addEventListener('waiting', function() { wrapper.classList.add('loading'); });
-    video.addEventListener('canplay', function() { wrapper.classList.remove('loading'); });
-    video.addEventListener('playing', function() { wrapper.classList.remove('loading'); });
-    video.addEventListener('error', function() { wrapper.classList.remove('loading'); });
-
-    // 点击全屏
     video.addEventListener('play', function() {
       if (video.requestFullscreen) {
         video.requestFullscreen().catch(function() {});
@@ -516,24 +492,6 @@
       }
     });
   });
-
-  // 懒加载：视频卡片进入视口时预加载
-  if ('IntersectionObserver' in window) {
-    var observer = new IntersectionObserver(function(entries) {
-      entries.forEach(function(entry) {
-        if (entry.isIntersecting) {
-          var vid = entry.target.querySelector('video');
-          if (vid && vid.preload !== 'auto') {
-            vid.preload = 'auto';
-          }
-          observer.unobserve(entry.target);
-        }
-      });
-    }, { rootMargin: '200px' });
-    document.querySelectorAll('.video-card').forEach(function(card) {
-      observer.observe(card);
-    });
-  }
 })();
 </script>
 
