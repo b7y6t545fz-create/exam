@@ -6,57 +6,84 @@
 <title>少儿篮球训练 · 二十节教学合集</title>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  /* ── 木地板纹理背景 ── */
   body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
-    background: #0b1219;
     color: #e0e0e0;
     min-height: 100vh;
+    background:
+      /* 木纹条纹 */
+      repeating-linear-gradient(
+        0deg,
+        #3b2518 0px, #4a2e1c 2px, #3b2518 4px,
+        #422a1a 8px, #4d301d 10px, #3b2518 12px,
+        #452b1a 16px, #4f321e 18px, #3b2518 20px
+      ),
+      /* 木纹竖纹 */
+      repeating-linear-gradient(
+        90deg,
+        transparent 0px, rgba(0,0,0,.06) 1px, transparent 2px,
+        transparent 40px, rgba(0,0,0,.04) 41px, transparent 42px
+      ),
+      /* 深色叠层 */
+      linear-gradient(180deg, #1a0f08 0%, #2a1a10 40%, #0d0804 100%);
+    background-blend-mode: overlay, overlay, normal;
   }
 
-  /* ── 顶部区域 ── */
+  /* ── 篮球场线条全局遮罩 ── */
+  .court-overlay {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .court-overlay::before {
+    content: "";
+    position: absolute;
+    inset: 60px 0 0 0;
+    background:
+      /* 边线 - 左右 */
+      linear-gradient(90deg, rgba(249,115,22,.06) 0px, rgba(249,115,22,.06) 1px, transparent 1px, transparent calc(100% - 1px), rgba(249,115,22,.06) calc(100% - 1px)),
+      /* 中线 */
+      linear-gradient(90deg, transparent calc(50% - 1px), rgba(249,115,22,.08) 50%, rgba(249,115,22,.08) calc(50% + 1px), transparent calc(50% + 1px)),
+      /* 罚球圈 */
+      radial-gradient(ellipse at 50% 45%, transparent 22%, rgba(249,115,22,.05) 22.1%, rgba(249,115,22,.05) 23%, transparent 23.1%),
+      radial-gradient(ellipse at 50% 75%, transparent 22%, rgba(249,115,22,.05) 22.1%, rgba(249,115,22,.05) 23%, transparent 23.1%);
+    opacity: .7;
+  }
+
+  /* ── 顶部 Hero 区域 ── */
   .hero {
     position: relative;
-    background: linear-gradient(180deg, #1a1e2e 0%, #0f1722 50%, #0b1219 100%);
-    padding: 56px 24px 40px;
+    z-index: 1;
+    padding: 64px 24px 44px;
     text-align: center;
     overflow: hidden;
-    border-bottom: 2px solid #1e2a38;
+    background: linear-gradient(180deg, rgba(10,5,2,.75) 0%, rgba(20,10,5,.6) 50%, rgba(10,5,2,.4) 100%);
   }
-  /* 篮球场线条背景 */
-  .hero::before {
-    content: "";
+  /* 篮球水印 */
+  .hero .ball-watermark {
     position: absolute;
-    inset: 0;
-    background:
-      /* 中线 */
-      linear-gradient(90deg, transparent 49.5%, rgba(249,115,22,.07) 50%, transparent 50.5%),
-      /* 三分线弧 */
-      radial-gradient(circle at 50% 80%, transparent 30%, rgba(249,115,22,.04) 31%, transparent 32%),
-      /* 罚球圈 */
-      radial-gradient(circle at 50% 50%, transparent 18%, rgba(249,115,22,.04) 19%, transparent 20%);
-    opacity: 0.6;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    width: 260px;
+    height: 260px;
+    opacity: .06;
     pointer-events: none;
   }
-  /* 篮球纹理点阵 */
-  .hero::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background-image: radial-gradient(circle, rgba(249,115,22,.06) 1px, transparent 1px);
-    background-size: 32px 32px;
-    opacity: 0.5;
-  }
+  .hero .ball-watermark svg { width: 100%; height: 100%; }
   .hero h1 {
     position: relative;
     font-size: clamp(22px, 4.5vw, 42px);
     font-weight: 900;
     letter-spacing: 2px;
-    background: linear-gradient(135deg, #f97316 0%, #ff9d4d 40%, #fbbf24 75%, #f59e0b 100%);
+    background: linear-gradient(135deg, #f97316 0%, #ff9d4d 35%, #fbbf24 65%, #f59e0b 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
     margin-bottom: 12px;
-    text-shadow: none;
   }
   .hero .tagline {
     position: relative;
@@ -64,7 +91,7 @@
     align-items: center;
     gap: 10px;
     font-size: 13px;
-    color: #8899aa;
+    color: #998877;
     letter-spacing: 3px;
     text-transform: uppercase;
   }
@@ -74,11 +101,11 @@
     width: 24px;
     height: 1px;
     background: #f97316;
-    opacity: 0.4;
+    opacity: .4;
   }
   .hero .subtitle {
     position: relative;
-    color: #667788;
+    color: #887766;
     font-size: 14px;
     margin-top: 12px;
     letter-spacing: 1px;
@@ -88,7 +115,7 @@
     color: #f0c040;
     font-size: 12px;
     margin-top: 10px;
-    opacity: 0.7;
+    opacity: .7;
   }
 
   /* ── 顶部吸附条 ── */
@@ -96,9 +123,9 @@
     position: sticky;
     top: 0;
     z-index: 100;
-    background: rgba(11,18,25,.92);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    background: rgba(15,7,3,.94);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
     border-bottom: 2px solid #f97316;
     padding: 10px 24px;
     display: flex;
@@ -106,7 +133,7 @@
     justify-content: center;
     gap: 16px;
     font-size: 13px;
-    color: #667788;
+    color: #998877;
   }
   .sticky-bar span {
     display: flex;
@@ -123,11 +150,13 @@
     height: 4px;
     background: #f97316;
     border-radius: 50%;
-    opacity: 0.5;
+    opacity: .5;
   }
 
   /* ── 主容器 ── */
   .container {
+    position: relative;
+    z-index: 1;
     max-width: 1280px;
     margin: 0 auto;
     padding: 20px 16px 48px;
@@ -140,10 +169,11 @@
     gap: 20px;
   }
   .video-card {
-    background: #111b26;
+    background: rgba(15,8,3,.88);
+    backdrop-filter: blur(8px);
     border-radius: 14px;
     overflow: hidden;
-    border: 1px solid #1e2d3d;
+    border: 1px solid rgba(50,35,20,.5);
     transition: transform .25s, border-color .25s, box-shadow .25s;
     display: flex;
     flex-direction: column;
@@ -155,7 +185,7 @@
     inset: 0;
     border-radius: 14px;
     padding: 1px;
-    background: linear-gradient(135deg, transparent 30%, rgba(249,115,22,.15) 100%);
+    background: linear-gradient(135deg, transparent 30%, rgba(249,115,22,.2) 100%);
     -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;
@@ -166,8 +196,8 @@
   }
   .video-card:hover {
     transform: translateY(-4px);
-    border-color: #f97316;
-    box-shadow: 0 12px 32px rgba(249,115,22,.1);
+    border-color: rgba(249,115,22,.6);
+    box-shadow: 0 12px 32px rgba(0,0,0,.4), 0 0 40px rgba(249,115,22,.06);
   }
   .video-card:hover::before { opacity: 1; }
 
@@ -177,10 +207,9 @@
     align-items: center;
     gap: 12px;
     padding: 16px 18px;
-    border-bottom: 1px solid #1e2d3d;
-    background: #0f1824;
+    border-bottom: 1px solid rgba(50,35,20,.4);
+    background: rgba(8,5,2,.5);
   }
-  /* 球衣背号风格序号 */
   .card-header .episode {
     background: #f97316;
     color: #fff;
@@ -193,10 +222,11 @@
     border-radius: 50%;
     flex-shrink: 0;
     box-shadow: 0 2px 8px rgba(249,115,22,.3);
+    letter-spacing: 1px;
   }
-  .card-header .episode.pass  { background: #f59e0b; }
+  .card-header .episode.pass     { background: #f59e0b; }
   .card-header .episode.shooting { background: #ef4444; }
-  .card-header .episode.review { background: #8b5cf6; }
+  .card-header .episode.review   { background: #8b5cf6; }
   .card-header .title {
     font-size: 16px;
     font-weight: 700;
@@ -216,12 +246,11 @@
     object-fit: contain;
     display: block;
   }
-  /* 视频占位覆盖层 */
   .video-wrapper::after {
     content: "";
     position: absolute;
     inset: 0;
-    background: radial-gradient(ellipse at center, transparent 60%, rgba(11,18,25,.6) 100%);
+    background: radial-gradient(ellipse at center, transparent 60%, rgba(0,0,0,.5) 100%);
     pointer-events: none;
   }
 
@@ -232,8 +261,8 @@
     justify-content: space-between;
     padding: 10px 18px;
     font-size: 12px;
-    color: #556677;
-    background: #0f1824;
+    color: #887766;
+    background: rgba(8,5,2,.5);
   }
   .card-footer .skill-tag {
     font-size: 11px;
@@ -242,11 +271,12 @@
     background: rgba(249,115,22,.1);
     color: #f97316;
     letter-spacing: 1px;
+    border: 1px solid rgba(249,115,22,.15);
   }
   .btn-play {
-    background: none;
-    border: 1px solid #334455;
-    color: #99aabb;
+    background: rgba(249,115,22,.1);
+    border: 1px solid rgba(249,115,22,.25);
+    color: #f97316;
     padding: 5px 16px;
     border-radius: 6px;
     font-size: 12px;
@@ -265,7 +295,7 @@
   .motivational-footer {
     text-align: center;
     padding: 48px 16px 40px;
-    border-top: 1px solid #1e2d3d;
+    border-top: 1px solid rgba(50,35,20,.4);
     margin-top: 32px;
     position: relative;
   }
@@ -289,7 +319,7 @@
     opacity: .85;
   }
   .motivational-footer .credit {
-    color: #445566;
+    color: #554433;
     font-size: 12px;
     margin-top: 24px;
     opacity: .6;
@@ -305,7 +335,12 @@
 </head>
 <body>
 
+<div class="court-overlay"></div>
+
 <header class="hero">
+  <div class="ball-watermark">
+    <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" fill="none" stroke="#f97316" stroke-width="2"/><line x1="50" y1="4" x2="50" y2="96" stroke="#f97316" stroke-width="1.5"/><path d="M 20 12 Q 35 40 20 88" fill="none" stroke="#f97316" stroke-width="1"/><path d="M 80 12 Q 65 40 80 88" fill="none" stroke="#f97316" stroke-width="1"/></svg>
+  </div>
   <h1>少儿篮球训练 · 二十节教学合集</h1>
   <div class="tagline">SYSTEMATIC TRAINING</div>
   <p class="subtitle">从球感入门到综合实战，系统掌握篮球基本功</p>
